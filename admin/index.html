@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Modern Blog</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="logo">ADMIN.PANEL</div>
+            <a href="../" class="btn" style="text-decoration: none; background: #334155;">View Blog</a>
+        </nav>
+
+        <!-- Auth Section -->
+        <div id="auth-section" class="glass-card" style="max-width: 500px; margin: 4rem auto;">
+            <h2 style="margin-bottom: 2rem; text-align: center;">Secure Login</h2>
+            <div class="form-group">
+                <label>GitHub Personal Access Token (PAT)</label>
+                <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxx">
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    We store this locally in your browser.
+                </p>
+            </div>
+            <div class="form-group">
+                <label>Repository (e.g. username/repo-name)</label>
+                <input type="text" id="github-repo" placeholder="yourname/my-blog">
+            </div>
+            <button id="login-btn" class="btn" style="width: 100%;">Connect to GitHub</button>
+        </div>
+
+        <!-- Post Form Section (Hidden until auth) -->
+        <div id="admin-content" style="display: none;">
+            <div class="glass-card" style="margin-bottom: 3rem;">
+                <h2 style="margin-bottom: 2rem;">Share a New Story</h2>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="post-title" placeholder="A catchy title...">
+                </div>
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea id="post-content" rows="6" placeholder="Write your story here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Cover Image</label>
+                    <input type="file" id="post-image" accept="image/*">
+                </div>
+                <button id="publish-btn" class="btn">Publish to Blog</button>
+                <div id="status" style="margin-top: 1rem; font-size: 0.875rem;"></div>
+            </div>
+
+            <h2 style="margin-bottom: 2rem;">Manage Recent Posts</h2>
+            <div id="admin-posts" class="post-grid">
+                <!-- Posts will be loaded here for management -->
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>

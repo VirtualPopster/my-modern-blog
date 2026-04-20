@@ -1,0 +1,9 @@
+[
+    {
+        "id": 1,
+        "title": "Welcome to my Zero-Cost Blog",
+        "content": "This blog is powered by GitHub Actions and the GitHub API. It's completely free to run and host. You can post images and text directly from the admin panel.",
+        "image": "https://picsum.photos/800/400",
+        "date": "2026-04-20"
+    }
+]

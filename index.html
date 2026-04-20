@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Blog</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="logo">MODERN.BLOG</div>
+            <a href="admin/" class="btn" style="text-decoration: none;">Admin Panel</a>
+        </nav>
+
+        <header style="margin-bottom: 4rem; text-align: center;">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem;">Thoughts & Stories</h1>
+            <p style="color: var(--text-muted);">A completely serverless blog experience.</p>
+        </header>
+
+        <div id="posts" class="post-grid">
+            <!-- Posts will be loaded here by JavaScript -->
+            <div style="text-align: center; grid-column: 1/-1;">Loading stories...</div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
