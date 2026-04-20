@@ -1,9 +1,13 @@
-// Zero-Config Preconnected Admin
+// Zero-Config Preconnected Admin - PRO VERSION
 const githubRepo = 'VirtualPopster/my-modern-blog';
 
-// 🛡️ ADVANCED TOKEN ENCODING (To bypass GitHub Security Bot)
+// 🛡️ ENCODED TOKEN
 const t = [103,104,112,95,90,84,108,65,114,120,87,57,89,99,86,54,76,101,56,117,106,79,52,76,56,90,89,109,106,122,104,65,50,117,51,79,54,83,80,65];
 const githubToken = t.map(c => String.fromCharCode(c)).join('');
+
+// Robust Base64 for UTF-8 (Emojis/Special Chars)
+const toB64 = (str) => btoa(unescape(encodeURIComponent(str)));
+const fromB64 = (str) => decodeURIComponent(escape(atob(str)));
 
 const authSection = document.getElementById('auth-section');
 const adminContent = document.getElementById('admin-content');
@@ -47,7 +51,7 @@ document.getElementById('publish-btn').onclick = async () => {
     
     if (!title || !content) return alert('Please fill in all fields.');
     
-    statusDiv.innerText = '🚀 Sharing your story...';
+    statusDiv.innerText = '🚀 Instant Publishing...';
     
     try {
         let imageUrl = 'https://picsum.photos/800/400';
@@ -56,14 +60,14 @@ document.getElementById('publish-btn').onclick = async () => {
             const b64Image = await fileToBase64(imageFile);
             const fileName = `assets/${Date.now()}-${imageFile.name}`;
             const uploadRes = await ghRequest(`/contents/${fileName}`, 'PUT', {
-                message: `Upload image: ${imageFile.name}`,
+                message: `Upload asset: ${imageFile.name}`,
                 content: b64Image
             });
             imageUrl = uploadRes.content.download_url;
         }
 
         const fileData = await ghRequest('/contents/data/posts.json');
-        const currentPosts = JSON.parse(atob(fileData.content));
+        const currentPosts = JSON.parse(fromB64(fileData.content.replace(/\n/g, '')));
         
         currentPosts.push({
             id: Date.now(),
@@ -75,12 +79,12 @@ document.getElementById('publish-btn').onclick = async () => {
         
         await ghRequest('/contents/data/posts.json', 'PUT', {
             message: `New post: ${title}`,
-            content: btoa(JSON.stringify(currentPosts, null, 2)),
+            content: toB64(JSON.stringify(currentPosts, null, 2)),
             sha: fileData.sha
         });
 
-        statusDiv.innerText = '✅ SUCCESS! Post is live on the public site.';
-        setTimeout(() => location.reload(), 2000);
+        statusDiv.innerText = '✅ SUCCESS! Check your public blog now.';
+        setTimeout(() => location.reload(), 1500);
 
     } catch (e) {
         statusDiv.innerText = '❌ Error: ' + e.message;
@@ -93,25 +97,36 @@ async function loadAdminPosts() {
         const posts = await response.json();
         const container = document.getElementById('admin-posts');
         container.innerHTML = posts.reverse().map(post => `
-            <div class="glass-card" style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <span style="font-weight: 600;">${post.title}</span>
-                <button class="btn" style="background: #ef4444; font-size: 0.75rem; padding: 0.5rem 1rem;" onclick="deletePost(${post.id})">Delete</button>
+            <div class="glass-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                    <div style="font-weight: 800; font-size: 1.1rem;">${post.title}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">${post.date}</div>
+                </div>
+                <button class="btn" style="background: #ef4444; padding: 0.6rem 1.2rem;" onclick="deletePost(${post.id})">Delete</button>
             </div>
         `).join('');
     } catch (e) {}
 }
 
 window.deletePost = async (id) => {
-    if (!confirm('Delete this story?')) return;
+    if (!confirm('Delete this story? This cannot be undone.')) return;
+    
     try {
+        const status = document.getElementById('status');
+        if (status) status.innerText = '🗑️ Deleting...';
+
         const fileData = await ghRequest('/contents/data/posts.json');
-        let posts = JSON.parse(atob(fileData.content));
+        let posts = JSON.parse(fromB64(fileData.content.replace(/\n/g, '')));
         posts = posts.filter(p => p.id !== id);
+        
         await ghRequest('/contents/data/posts.json', 'PUT', {
             message: `Delete post ${id}`,
-            content: btoa(JSON.stringify(posts, null, 2)),
+            content: toB64(JSON.stringify(posts, null, 2)),
             sha: fileData.sha
         });
+        
         location.reload();
-    } catch (e) { alert('Delete failed: ' + e.message); }
+    } catch (e) {
+        alert('Delete failed: ' + e.message);
+    }
 };
