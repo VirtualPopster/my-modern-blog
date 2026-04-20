@@ -3,8 +3,9 @@ let lastHash = "";
 async function fetchPosts(isInitial = false) {
     const postsContainer = document.getElementById('posts');
     try {
-        // ⚡ REAL-TIME SYNC: Fetching the raw JSON with a timestamp to bypass all caching
-        const res = await fetch(`https://raw.githubusercontent.com/VirtualPopster/my-modern-blog/main/data/posts.json?v=${Date.now()}`);
+        // ⚡ PUBLIC RAW URL: No token needed, no 401 errors, 100% stable
+        const url = `https://raw.githubusercontent.com/VirtualPopster/my-modern-blog/main/data/posts.json?v=${Date.now()}`;
+        const res = await fetch(url);
         if (!res.ok) return;
         
         const posts = await res.json();
@@ -18,29 +19,28 @@ async function fetchPosts(isInitial = false) {
                 return;
             }
 
-            // High-speed rendering with smooth animations
             postsContainer.innerHTML = posts.reverse().map(post => `
-                <article class="post-card glass-card" style="animation: slideUp 0.6s ease-out forwards; margin-bottom: 2.5rem;">
+                <article class="post-card glass-card" style="animation: slideUp 0.6s ease-out forwards; margin-bottom: 3rem;">
                     <img src="${post.image}" alt="${post.title}" class="post-image" onerror="this.src='https://via.placeholder.com/800x400?text=No+Image'">
-                    <div style="padding: 0.5rem 0;">
+                    <div style="padding: 1rem 0;">
                         <div class="post-meta">${new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
-                        <h2 class="post-title" style="font-size: 2.2rem; margin: 0.75rem 0; font-weight: 800; line-height: 1.2;">${post.title}</h2>
+                        <h2 class="post-title" style="font-size: 2.5rem; margin: 1rem 0; font-weight: 900;">${post.title}</h2>
                         <p style="color: var(--text-muted); line-height: 1.8; font-size: 1.15rem; white-space: pre-wrap;">${post.content}</p>
                     </div>
                 </article>
             `).join('');
         }
     } catch (e) {
-        console.warn('Syncing...');
+        // Silent recovery
     }
 }
 
-// 🚀 HEARTBEAT: Checks every 1 second
+// 🚀 START THE HEARTBEAT (1 SECOND)
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts(true);
     setInterval(fetchPosts, 1000); 
 });
 
 const style = document.createElement('style');
-style.innerHTML = `@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }`;
+style.innerHTML = `@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }`;
 document.head.appendChild(style);
