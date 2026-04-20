@@ -1,9 +1,6 @@
-// Zero-Config Preconnected Admin - 100% STEALTH
+// Zero-Revocation Admin - 100% SECURE
 const githubRepo = 'VirtualPopster/my-modern-blog';
-
-// 🛡️ STEALTH DECODER (Impossible for GitHub to detect)
-const stealth = "hig^`UlBsw:XdU7Me9vkP5M9[Znk{iB1v4P7TQAB";
-const githubToken = stealth.split('').map(c => String.fromCharCode(c.charCodeAt(0) - 1)).join('');
+let githubToken = localStorage.getItem('blog-pat') || '';
 
 // Robust Base64 for UTF-8 (Emojis/Special Chars)
 const toB64 = (str) => btoa(unescape(encodeURIComponent(str)));
@@ -13,15 +10,7 @@ const authSection = document.getElementById('auth-section');
 const adminContent = document.getElementById('admin-content');
 const statusDiv = document.getElementById('status');
 
-// Helper: Convert File to Base64
-const fileToBase64 = (file) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = (error) => reject(error);
-});
-
-// Helper: GitHub API Call
+// 1. Helper: GitHub API Call
 async function ghRequest(path, method = 'GET', body = null) {
     const res = await fetch(`https://api.github.com/repos/${githubRepo}${path}`, {
         method,
@@ -36,14 +25,33 @@ async function ghRequest(path, method = 'GET', body = null) {
     return res.json();
 }
 
-// 2. Immediate Landing Logic
+// 2. Landing Logic
 if (githubToken) {
     authSection.style.display = 'none';
     adminContent.style.display = 'block';
     loadAdminPosts();
 }
 
-// 3. Post Publishing Logic
+// 3. Connect Button (Prime the browser)
+document.getElementById('login-btn').onclick = async () => {
+    const token = document.getElementById('github-token').value;
+    if (!token) return alert('Paste your new token to activate.');
+    
+    try {
+        // Test the token
+        const res = await fetch(`https://api.github.com/repos/${githubRepo}`, {
+            headers: { 'Authorization': `token ${token}` }
+        });
+        if (!res.ok) throw new Error();
+        
+        localStorage.setItem('blog-pat', token);
+        location.reload();
+    } catch (e) {
+        alert('❌ Error: Token is invalid or has wrong permissions.');
+    }
+};
+
+// 4. Publish Function
 document.getElementById('publish-btn').onclick = async () => {
     const title = document.getElementById('post-title').value;
     const content = document.getElementById('post-content').value;
@@ -51,13 +59,17 @@ document.getElementById('publish-btn').onclick = async () => {
     
     if (!title || !content) return alert('Please fill in all fields.');
     
-    statusDiv.innerText = '🚀 Instant Sharing...';
+    statusDiv.innerText = '🚀 Sharing your story...';
     
     try {
         let imageUrl = 'https://picsum.photos/800/400';
         
         if (imageFile) {
-            const b64Image = await fileToBase64(imageFile);
+            const reader = new FileReader();
+            reader.readAsDataURL(imageFile);
+            const b64Image = await new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+            });
             const fileName = `assets/${Date.now()}-${imageFile.name}`;
             const uploadRes = await ghRequest(`/contents/${fileName}`, 'PUT', {
                 message: `Upload asset: ${imageFile.name}`,
@@ -83,23 +95,24 @@ document.getElementById('publish-btn').onclick = async () => {
             sha: fileData.sha
         });
 
-        statusDiv.innerText = '✅ SUCCESS! Check your public blog now.';
+        statusDiv.innerText = '✅ SUCCESS! Post is live.';
         setTimeout(() => location.reload(), 1500);
 
     } catch (e) {
-        statusDiv.innerText = '❌ Error: ' + e.message;
+        statusDiv.innerText = '❌ Sync Error: ' + e.message;
     }
 };
 
+// 5. Load/Delete Posts
 async function loadAdminPosts() {
     try {
-        const response = await fetch(`../data/posts.json?v=${new Date().getTime()}`);
+        const response = await fetch(`https://raw.githubusercontent.com/VirtualPopster/my-modern-blog/main/data/posts.json?v=${Date.now()}`);
         const posts = await response.json();
         const container = document.getElementById('admin-posts');
         container.innerHTML = posts.reverse().map(post => `
-            <div class="glass-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div class="glass-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <div>
-                    <div style="font-weight: 800; font-size: 1.1rem;">${post.title}</div>
+                    <div style="font-weight: 800; font-size: 1.2rem;">${post.title}</div>
                     <div style="font-size: 0.75rem; color: var(--text-muted);">${post.date}</div>
                 </div>
                 <button class="btn" style="background: #ef4444; padding: 0.6rem 1.2rem;" onclick="deletePost(${post.id})">Delete</button>
@@ -111,8 +124,7 @@ async function loadAdminPosts() {
 window.deletePost = async (id) => {
     if (!confirm('Delete this story?')) return;
     try {
-        const status = document.getElementById('status');
-        if (status) status.innerText = '🗑️ Deleting...';
+        statusDiv.innerText = '🗑️ Deleting...';
         const fileData = await ghRequest('/contents/data/posts.json');
         let posts = JSON.parse(fromB64(fileData.content.replace(/\n/g, '')));
         posts = posts.filter(p => p.id !== id);
