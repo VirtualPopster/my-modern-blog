@@ -45,11 +45,9 @@ if (githubToken) {
     loadAdminPosts();
 }
 
-// 3. Manual Login (Backup only)
-document.getElementById('login-btn').onclick = async () => {
-    githubToken = document.getElementById('github-token').value;
-    if (!githubToken) return alert('Please enter your token.');
-    localStorage.setItem('blog-pat', githubToken);
+// 3. Reset Session Logic
+document.getElementById('reset-session').onclick = () => {
+    localStorage.removeItem('blog-pat');
     location.reload();
 };
 
