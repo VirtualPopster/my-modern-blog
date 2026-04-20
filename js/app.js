@@ -3,7 +3,7 @@ let lastHash = "";
 async function fetchPosts(isInitial = false) {
     const postsContainer = document.getElementById('posts');
     try {
-        // ⚡ PUBLIC RAW URL: No token needed, no 401 errors, 100% stable
+        // ⚡ INSTANT LIVE REFRESH: Checks every 1 second
         const url = `https://raw.githubusercontent.com/VirtualPopster/my-modern-blog/main/data/posts.json?v=${Date.now()}`;
         const res = await fetch(url);
         if (!res.ok) return;
@@ -30,9 +30,7 @@ async function fetchPosts(isInitial = false) {
                 </article>
             `).join('');
         }
-    } catch (e) {
-        // Silent recovery
-    }
+    } catch (e) {}
 }
 
 // 🚀 START THE HEARTBEAT (1 SECOND)

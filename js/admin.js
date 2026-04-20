@@ -1,12 +1,10 @@
-// Zero-Config Preconnected Admin - GHOST TOKEN PRO
-const githubRepo = 'VirtualPopster/my-modern-blog';
+// Zero-Config Preconnected Admin - 100% SECURE PIPELINE
+const githubRepo = 'VirtualPopster/my-modern-blog'; 
 
-// 👻 GHOST TOKEN: Fragmented and impossible for GitHub Bots to detect.
-const _a = String.fromCharCode(103); const _b = String.fromCharCode(104); const _c = String.fromCharCode(112); const _d = String.fromCharCode(95);
-const _e = "ZTlArxW9YcV6"; const _f = "Le8ujO4L8"; const _g = "ZYmjzhA2u3O6SPA";
-const githubToken = _a + _b + _c + _d + _e + _f + _g;
+// THE TOKEN BELOW IS INJECTED AUTOMATICALLY DURING DEPLOYMENT - DO NOT EDIT
+let githubToken = 'INJECT_TOKEN_HERE'; 
 
-// High-speed UTF-8 Base64 handlers
+// Robust Base64 for UTF-8 (Emojis/Special Chars)
 const toB64 = (s) => btoa(unescape(encodeURIComponent(s)));
 const fromB64 = (s) => decodeURIComponent(escape(atob(s)));
 
@@ -14,7 +12,7 @@ const authSection = document.getElementById('auth-section');
 const adminContent = document.getElementById('admin-content');
 const statusDiv = document.getElementById('status');
 
-// 1. Helper: GitHub API Call
+// Helper: GitHub API Call
 async function ghRequest(path, method = 'GET', body = null) {
     const res = await fetch(`https://api.github.com/repos/${githubRepo}${path}`, {
         method,
@@ -30,13 +28,13 @@ async function ghRequest(path, method = 'GET', body = null) {
 }
 
 // 2. Landing Logic
-if (githubToken) {
+if (githubToken && githubToken !== 'INJECT_TOKEN_HERE') {
     authSection.style.display = 'none';
     adminContent.style.display = 'block';
     loadAdminPosts();
 }
 
-// 3. Instant Post Publishing
+// 3. Post Publishing Logic
 document.getElementById('publish-btn').onclick = async () => {
     const title = document.getElementById('post-title').value;
     const content = document.getElementById('post-content').value;
@@ -88,7 +86,6 @@ document.getElementById('publish-btn').onclick = async () => {
     }
 };
 
-// 4. Robust Load & Delete
 async function loadAdminPosts() {
     try {
         const response = await fetch(`https://raw.githubusercontent.com/VirtualPopster/my-modern-blog/main/data/posts.json?v=${Date.now()}`);
